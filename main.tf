@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
@@ -31,6 +33,14 @@ module "iam" {
   environment  = var.environment
 }
 
+module "ecr" {
+  source = "./modules/ecr"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  image_tag_mutability = var.ecr_image_tag_mutability
+}
+
 module "ec2" {
   source = "./modules/ec2"
 
@@ -42,16 +52,20 @@ module "ec2" {
   ami_id            = data.aws_ami.amazon_linux.id
   key_name          = var.ec2_key_name
   ec2_instance_role = module.iam.ec2_instance_profile_name
+  allowed_ssh_cidr  = var.allowed_ssh_cidr
 }
 
 module "alb" {
   source = "./modules/alb"
 
-  project_name      = var.project_name
-  environment       = var.environment
-  vpc_id            = module.vpc.vpc_id
-  public_subnet_ids = module.vpc.public_subnet_ids
-  container_port    = var.ecs_container_port
+  project_name       = var.project_name
+  environment        = var.environment
+  vpc_id             = module.vpc.vpc_id
+  public_subnet_ids  = module.vpc.public_subnet_ids
+  container_port     = var.ecs_container_port
+  enable_access_logs = true
+  aws_account_id     = data.aws_caller_identity.current.account_id
+  aws_region         = var.aws_region
 }
 
 module "ecs" {
@@ -85,6 +99,7 @@ module "eks" {
   max_nodes            = var.eks_max_nodes
   eks_cluster_role_arn = module.iam.eks_cluster_role_arn
   eks_node_role_arn    = module.iam.eks_node_role_arn
+  allowed_eks_cidr     = var.allowed_eks_cidr
 }
 
 module "waf" {
@@ -107,4 +122,17 @@ module "rds" {
     module.ecs.ecs_security_group_id,
     module.eks.eks_cluster_sg_id
   ]
+}
+
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  project_name                = var.project_name
+  environment                 = var.environment
+  alert_email                 = var.alert_email
+  ecs_cluster_name            = module.ecs.cluster_name
+  ecs_service_name            = module.ecs.service_name
+  rds_instance_identifier     = module.rds.db_instance_identifier
+  alb_arn_suffix              = module.alb.alb_arn_suffix
+  alb_target_group_arn_suffix = module.alb.target_group_arn_suffix
 }

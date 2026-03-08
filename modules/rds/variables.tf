@@ -64,3 +64,9 @@ variable "allowed_security_group_ids" {
   description = "List of security group IDs allowed to connect to the database (e.g., from ECS/EKS tasks)"
   type        = list(string)
 }
+
+variable "backup_retention_period" {
+  description = "Number of days to retain automated backups (0 to disable, max 35)"
+  type        = number
+  default     = 7
+}

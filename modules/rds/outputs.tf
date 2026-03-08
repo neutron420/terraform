@@ -22,3 +22,8 @@ output "db_instance_username" {
   description = "The master username for the database"
   value       = aws_db_instance.main.username
 }
+
+output "db_instance_identifier" {
+  description = "The RDS instance identifier"
+  value       = aws_db_instance.main.identifier
+}

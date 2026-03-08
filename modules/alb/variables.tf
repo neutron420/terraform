@@ -22,3 +22,19 @@ variable "container_port" {
   description = "Port the container listens on"
   type        = number
 }
+
+variable "enable_access_logs" {
+  description = "Whether to enable ALB access logs"
+  type        = bool
+  default     = true
+}
+
+variable "aws_account_id" {
+  description = "AWS account ID (required for ALB access logs S3 bucket policy)"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+}

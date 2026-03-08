@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "ap-south-1"
 }
 
+variable "aws_account_id" {
+  description = "AWS account ID (used for ALB access logs bucket policy)"
+  type        = string
+  default     = ""
+}
+
 variable "project_name" {
   description = "Name of the project (used for tagging and naming resources)"
   type        = string
@@ -50,6 +56,18 @@ variable "ec2_key_name" {
   description = "Name of the SSH key pair for EC2 access (must exist in AWS)"
   type        = string
   default     = "my-key-pair"
+}
+
+variable "allowed_ssh_cidr" {
+  description = "CIDR blocks allowed to SSH into EC2 (empty list disables SSH, use SSM instead)"
+  type        = list(string)
+  default     = []
+}
+
+variable "allowed_eks_cidr" {
+  description = "CIDR blocks allowed to access EKS API (default: open, restrict for production)"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
 
 variable "ecs_container_image" {
@@ -100,10 +118,20 @@ variable "eks_max_nodes" {
   default     = 3
 }
 
-# ── RDS Variables ─────────────────────────────────────────────────────────────
-
 variable "db_password" {
-  description = "Password for the RDS master DB user"
+  description = "Password for the RDS master DB user (set via TF_VAR_db_password env variable)"
   type        = string
   sensitive   = true
+}
+
+variable "ecr_image_tag_mutability" {
+  description = "ECR image tag mutability (MUTABLE or IMMUTABLE)"
+  type        = string
+  default     = "MUTABLE"
+}
+
+variable "alert_email" {
+  description = "Email address to receive CloudWatch alarm notifications (leave empty to skip)"
+  type        = string
+  default     = ""
 }

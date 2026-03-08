@@ -52,3 +52,9 @@ variable "eks_node_role_arn" {
   description = "ARN of the EKS node group IAM role"
   type        = string
 }
+
+variable "allowed_eks_cidr" {
+  description = "List of CIDR blocks allowed to access the EKS API (port 443)"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}

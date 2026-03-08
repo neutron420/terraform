@@ -53,9 +53,22 @@ resource "aws_db_instance" "main" {
   publicly_accessible = false
   skip_final_snapshot = var.environment == "dev" ? true : false
   apply_immediately   = true
+  storage_encrypted   = true
 
-  # Note: in a production environment, you should encrypt storage and set up backups
-  storage_encrypted = true
+  # Backup configuration
+  backup_retention_period = var.backup_retention_period
+  backup_window           = "03:00-04:00"
+  maintenance_window      = "Mon:04:00-Mon:05:00"
+
+  # Final snapshot for non-dev environments
+  final_snapshot_identifier = var.environment != "dev" ? "${var.project_name}-db-final-snapshot-${var.environment}" : null
+
+  # Performance Insights (free tier for db.t3.micro)
+  performance_insights_enabled          = true
+  performance_insights_retention_period = 7
+
+  # Deletion protection for prod
+  deletion_protection = var.environment == "prod" ? true : false
 
   tags = {
     Name = "${var.project_name}-rds-${var.environment}"

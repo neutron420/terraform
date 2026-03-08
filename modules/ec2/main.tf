@@ -1,14 +1,17 @@
 resource "aws_security_group" "ec2_sg" {
   name        = "${var.project_name}-ec2-sg-${var.environment}"
-  description = "Security group for EC2 instance - allows SSH and HTTP"
+  description = "Security group for EC2 instance"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description = "SSH access"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = length(var.allowed_ssh_cidr) > 0 ? [1] : []
+    content {
+      description = "SSH access (restricted)"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = var.allowed_ssh_cidr
+    }
   }
 
   ingress {
@@ -47,6 +50,12 @@ resource "aws_instance" "main" {
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
   key_name               = var.key_name
   iam_instance_profile   = var.ec2_instance_role
+  monitoring             = true
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
 
   root_block_device {
     volume_size           = 20

@@ -37,3 +37,9 @@ variable "ec2_instance_role" {
   description = "Name of the IAM instance profile for EC2"
   type        = string
 }
+
+variable "allowed_ssh_cidr" {
+  description = "List of CIDR blocks allowed to SSH into the EC2 instance"
+  type        = list(string)
+  default     = []
+}

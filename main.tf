@@ -74,15 +74,37 @@ module "ecs" {
 module "eks" {
   source = "./modules/eks"
 
-  project_name           = var.project_name
-  environment            = var.environment
-  vpc_id                 = module.vpc.vpc_id
-  private_subnet_ids     = module.vpc.private_subnet_ids
-  cluster_version        = var.eks_cluster_version
-  node_instance_type     = var.eks_node_instance_type
-  desired_nodes          = var.eks_desired_nodes
-  min_nodes              = var.eks_min_nodes
-  max_nodes              = var.eks_max_nodes
-  eks_cluster_role_arn   = module.iam.eks_cluster_role_arn
-  eks_node_role_arn      = module.iam.eks_node_role_arn
+  project_name         = var.project_name
+  environment          = var.environment
+  vpc_id               = module.vpc.vpc_id
+  private_subnet_ids   = module.vpc.private_subnet_ids
+  cluster_version      = var.eks_cluster_version
+  node_instance_type   = var.eks_node_instance_type
+  desired_nodes        = var.eks_desired_nodes
+  min_nodes            = var.eks_min_nodes
+  max_nodes            = var.eks_max_nodes
+  eks_cluster_role_arn = module.iam.eks_cluster_role_arn
+  eks_node_role_arn    = module.iam.eks_node_role_arn
+}
+
+module "waf" {
+  source = "./modules/waf"
+
+  project_name = var.project_name
+  environment  = var.environment
+  alb_arn      = module.alb.alb_arn
+}
+
+module "rds" {
+  source = "./modules/rds"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  db_password        = var.db_password
+  allowed_security_group_ids = [
+    module.ecs.ecs_security_group_id,
+    module.eks.eks_cluster_sg_id
+  ]
 }

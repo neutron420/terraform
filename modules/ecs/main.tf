@@ -92,7 +92,11 @@ resource "aws_ecs_service" "main" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.main.arn
   desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 100
+  }
 
   network_configuration {
     subnets          = var.private_subnet_ids
@@ -150,7 +154,7 @@ resource "aws_appautoscaling_policy" "ecs_request_count" {
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label         = "${var.alb_target_group_arn}"
+      resource_label         = var.alb_target_group_arn
     }
     target_value       = 1000
     scale_in_cooldown  = 300

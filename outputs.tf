@@ -47,3 +47,27 @@ output "eks_cluster_endpoint" {
   description = "Endpoint URL of the EKS cluster"
   value       = module.eks.cluster_endpoint
 }
+
+# ── WAF Outputs ───────────────────────────────────────────────────────────────
+
+output "waf_web_acl_arn" {
+  description = "ARN of the WAF Web ACL protecting the ALB"
+  value       = module.waf.web_acl_arn
+}
+
+# ── RDS Outputs ───────────────────────────────────────────────────────────────
+
+output "rds_endpoint" {
+  description = "Connection endpoint of the RDS database"
+  value       = module.rds.db_instance_endpoint
+}
+
+output "rds_address" {
+  description = "Address of the RDS instance"
+  value       = module.rds.db_instance_address
+}
+
+output "rds_port" {
+  description = "Port of the RDS instance"
+  value       = module.rds.db_instance_port
+}

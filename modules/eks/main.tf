@@ -64,7 +64,7 @@ resource "aws_eks_node_group" "main" {
   subnet_ids      = var.private_subnet_ids
 
   instance_types = [var.node_instance_type]
-  capacity_type  = "ON_DEMAND"
+  capacity_type  = "SPOT"
 
   scaling_config {
     desired_size = var.desired_nodes

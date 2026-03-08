@@ -99,3 +99,11 @@ variable "eks_max_nodes" {
   type        = number
   default     = 3
 }
+
+# ── RDS Variables ─────────────────────────────────────────────────────────────
+
+variable "db_password" {
+  description = "Password for the RDS master DB user"
+  type        = string
+  sensitive   = true
+}

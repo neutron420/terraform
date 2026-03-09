@@ -100,6 +100,7 @@ graph LR
     ECS --> RDS
     ECS --> MON
     EKS --> RDS
+    EKS --> ARGOCD["ArgoCD Module"]
 
     RDS --> MON
 
@@ -115,6 +116,7 @@ graph LR
     style RDS fill:#3b48cc,stroke:#1A237E,color:#fff
     style ECR fill:#FF9900,stroke:#E65100,color:#fff
     style MON fill:#9C27B0,stroke:#4A148C,color:#fff
+    style ARGOCD fill:#EF7B4D,stroke:#D84315,color:#fff
 ```
 
 ### Request Flow (How Traffic Reaches Your App)
@@ -279,6 +281,7 @@ graph LR
 | **RDS** | PostgreSQL with backups, Performance Insights, encrypted storage, deletion protection (prod) |
 | **ECR** | Container registry with image scanning, encryption, lifecycle cleanup policies |
 | **Monitoring** | 8 CloudWatch Alarms (ECS/RDS/ALB) + SNS email alerts |
+| **ArgoCD** | Helm release of ArgoCD into the EKS cluster |
 
 ## Project Structure
 
@@ -307,7 +310,8 @@ terraform/
     ├── waf/                # Web Application Firewall
     ├── rds/                # PostgreSQL database
     ├── ecr/                # Container registry
-    └── monitoring/         # CloudWatch alarms + SNS
+    ├── monitoring/         # CloudWatch alarms + SNS
+    └── argocd/             # ArgoCD GitOps via Helm
 ```
 
 ## Prerequisites
@@ -398,7 +402,7 @@ All values can be customized in `terraform.tfvars`:
 | `ec2_instance_type` | `t3.micro` | EC2 instance size |
 | `ec2_key_name` | `my-key-pair` | SSH key pair name |
 | `allowed_ssh_cidr` | `[]` (disabled) | CIDRs allowed to SSH into EC2 |
-| `allowed_eks_cidr` | `["0.0.0.0/0"]` | CIDRs allowed to access EKS API |
+| `allowed_eks_cidr` | `["10.0.0.0/16"]` | CIDRs allowed to access EKS API |
 | `ecs_container_image` | `nginx:latest` | ECS Fargate container image |
 | `ecs_desired_count` | `2` | Number of ECS tasks |
 | `eks_cluster_version` | `1.29` | Kubernetes version |
@@ -490,4 +494,4 @@ terraform destroy
 
 ---
 
-**Built with Terraform** · Region: `ap-south-1` (Mumbai) · 10 Modules · Production-Ready Template
+**Built with Terraform** · Region: `ap-south-1` (Mumbai) · 11 Modules · Production-Ready Template

@@ -136,3 +136,9 @@ module "monitoring" {
   alb_arn_suffix              = module.alb.alb_arn_suffix
   alb_target_group_arn_suffix = module.alb.target_group_arn_suffix
 }
+
+module "argocd" {
+  source = "./modules/argocd"
+
+  depends_on = [module.eks]
+}

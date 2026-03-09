@@ -11,7 +11,7 @@ ec2_instance_type = "t3.micro"
 ec2_key_name      = "my-key-pair"
 
 allowed_ssh_cidr = []
-allowed_eks_cidr = ["0.0.0.0/0"]
+allowed_eks_cidr = ["10.0.0.0/16"]
 
 ecs_container_image = "nginx:latest"
 ecs_container_port  = 80

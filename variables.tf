@@ -4,11 +4,6 @@ variable "aws_region" {
   default     = "ap-south-1"
 }
 
-variable "aws_account_id" {
-  description = "AWS account ID (used for ALB access logs bucket policy)"
-  type        = string
-  default     = ""
-}
 
 variable "project_name" {
   description = "Name of the project (used for tagging and naming resources)"
@@ -65,9 +60,9 @@ variable "allowed_ssh_cidr" {
 }
 
 variable "allowed_eks_cidr" {
-  description = "CIDR blocks allowed to access EKS API (default: open, restrict for production)"
+  description = "CIDR blocks allowed to access EKS API (restrict to your IP/VPN for production)"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = ["10.0.0.0/16"]
 }
 
 variable "ecs_container_image" {
@@ -122,6 +117,16 @@ variable "db_password" {
   description = "Password for the RDS master DB user (set via TF_VAR_db_password env variable)"
   type        = string
   sensitive   = true
+
+  validation {
+    condition     = length(var.db_password) >= 8
+    error_message = "The db_password must be at least 8 characters long. Set it via: $env:TF_VAR_db_password = 'YourSecurePassword123!'"
+  }
+
+  validation {
+    condition     = can(regex("[A-Z]", var.db_password)) && can(regex("[a-z]", var.db_password)) && can(regex("[0-9]", var.db_password))
+    error_message = "The db_password must contain at least one uppercase letter, one lowercase letter, and one number."
+  }
 }
 
 variable "ecr_image_tag_mutability" {
